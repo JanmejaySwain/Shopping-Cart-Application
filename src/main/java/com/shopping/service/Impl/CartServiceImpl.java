@@ -35,7 +35,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItem addItemTocart(CartRequest cartRequest) {
         User user = userRepository.findById(cartRequest.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User", "userId", cartRequest.getUserId()));
+        System.out.println(user);
         Product product = productRepository.findById(cartRequest.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product", "Product", cartRequest.getProductId()));
+        System.out.println(product);
         if (cartRequest.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
@@ -43,9 +45,12 @@ public class CartServiceImpl implements CartService {
             throw new QuantityLimitExceededException(HttpStatus.BAD_REQUEST,"Quantity exceeds available stock");
         }
         CartItem existingCartItem=cartItemRepository.findByUserAndProduct(user, product);
+        System.out.println(existingCartItem);
         if (existingCartItem != null) {
             existingCartItem.setQuantity(existingCartItem.getQuantity() + cartRequest.getQuantity());
-            return cartItemRepository.save(existingCartItem);
+            CartItem savedCartItem = cartItemRepository.save(existingCartItem);
+            System.out.println(savedCartItem);
+            return savedCartItem;
         } else {
             CartItem cartItem = new CartItem(user, product,cartRequest.getQuantity());
             return cartItemRepository.save(cartItem);
@@ -70,7 +75,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public Order checkout(Long userId, List<Long> cartItemIds) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+        System.out.println(user);
         List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
+        System.out.println(cartItems);
         if (cartItems.isEmpty()) {
             throw new CartItemNotFoundException(HttpStatus.NOT_FOUND,"No cart items found for checkout");
         }
@@ -82,13 +89,13 @@ public class CartServiceImpl implements CartService {
             }
             totalAmount += product.getPrice().doubleValue() * cartItem.getQuantity();
             product.setQuantityAvailable(product.getQuantityAvailable() - cartItem.getQuantity());
-            productRepository.save(product);
+            Product savedProduct = productRepository.save(product);
+            System.out.println(savedProduct);
             cartItemRepository.delete(cartItem);
         }
         Order order = new Order(user, totalAmount);
         order.setCartItems(cartItems);
         orderRepository.save(order);
-
         return order;
     }
 
