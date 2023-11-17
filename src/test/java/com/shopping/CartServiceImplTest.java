@@ -89,7 +89,7 @@ public class CartServiceImplTest {
         List<Long> cartItemIds= Arrays.asList(1L);
         when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
         when(cartItemRepository.findAllById(cartItemIds)).thenReturn(Stream.of(new CartItem(user,product,2)).collect(Collectors.toList()));
-    when(productRepository.save(ArgumentMatchers.any())).thenReturn(product);
+        when(productRepository.save(ArgumentMatchers.any())).thenReturn(product);
 //     when(cartItemRepository.delete(cartItem)).thenReturn(null);
 //        doAnswer(invocationOnMock -> {
 //            return null;

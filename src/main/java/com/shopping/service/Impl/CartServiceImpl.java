@@ -92,10 +92,12 @@ public class CartServiceImpl implements CartService {
             Product savedProduct = productRepository.save(product);
             System.out.println(savedProduct);
             cartItemRepository.delete(cartItem);
+
         }
         Order order = new Order(user, totalAmount);
         order.setCartItems(cartItems);
         orderRepository.save(order);
+        System.out.println("Order :"+order);
         return order;
     }
 
